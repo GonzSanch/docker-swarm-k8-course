@@ -1,0 +1,9 @@
+
+# Dockerfile 
+*Dockerfile*
+
+#ignore setup.sh
+setup.sh
+
+# Node dependencies
+node_modules
