@@ -143,6 +143,5 @@ curl http://$IP:8888/
 curl -s http://$IP:8888/ | jq .HOSTNAME
 kubectl delete -f https://bret.run/shpod.yml
 ```
-- visualizing service traffic
 
 
