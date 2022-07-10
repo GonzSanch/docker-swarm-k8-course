@@ -360,3 +360,54 @@ curl $IP/v2/_catalog
 ```
 
 To avoid manage 'secret' data in ConfigMaps we will use secrets, that applies the same functionality but are more secure using a base64 encrypt. They are uses the same way as ConfigMaps substuting kind resource configmap to secret will work all the way.
+
+### Deploying NGINX and ingress resources
+
+Deploy a ingress controller that consist in a reverse proxy of nginx.
+
+```shell
+# for Docker Desktop, create Service with LoadBalancer
+curl -O https://k8smastery.com/ic-nginx-lb.yaml
+kubectl apply -f ic-nginx-lb.yaml
+# for minikube/MicroK8s, create Service with hostNetwork
+curl -O https://k8smastery.com/ic-nginx-hn.yaml
+kubectl apply -f ic-nginx-hn.yaml
+# Check the pod Status
+kubectl describe -n ingress-nginx deploy/ingress-nginx-controller
+# ingress DNS and test apps
+# As a DNS we will use nip.io that is a DNS on internet that will redirect to our private network ie: 192-168-1-250.nip.io maps to 192.168.1.250
+# Running cheesy web servers for test apps
+kubectl create deployment cheddar --image=errm/cheese:cheddar
+kubectl create deployment stilton --image=errm/cheese:stilton
+kubectl create deployment wensleydale --image=errm/cheese:wensleydale
+# Create a service for each of them
+kubectl expose deployment cheddar --port=80
+kubectl expose deployment stilton --port=80
+kubectl expose deployment wensleydale --port=80
+# Create ingress controllers
+kubectl apply -f ingress.yaml
+# If uses minikube with docker driver ensure that you are running minikube tunnel
+minikube tunnel
+# Check and test url provides by ingress
+kubectl get ingress
+```
+
+### Traefik ingress
+
+In this section we will replace nginx ingress (official deafult k8s ingress) for traefil an advanced load balancer.
+
+```shell
+# Delete our NGINX controller and related resources
+# Docker desktop
+kubectl delete -f ic-nginx-lb.yaml
+# minikube/MicroK8s
+kubectl delete -f ic-nginx-hn.yaml
+# for Docker Desktop, create Service with LoadBalancer
+curl -O https://k8smastery.com/ic-traefik-lb.yaml
+kubectl apply -f ic-traefik-lb.yaml
+# for minikube/MicroK8s, create Service with hostNetwork
+curl -O https://k8smastery.com/ic-traefik-hn.yaml
+kubectl apply -f ic-traefik-hn.yaml
+# Check the pod Status
+kubectl describe -n kube-system ds/traefik-ingress-controller
+```
